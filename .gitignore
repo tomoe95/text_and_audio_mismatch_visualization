@@ -2,6 +2,8 @@
 
 # audio files
 *.wav
+*.webm
+./backend/upload/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
