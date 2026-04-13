@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export default function Recorder() {
@@ -96,7 +96,7 @@ export default function Recorder() {
             console.log("Server response:", result)
             alert("Upload sucessful!")
             // Jump to /analyze path
-            navigate('/analyze')
+            navigate('/analyze', { state: {emotionsData: result.data } })
         } catch (error) {
             console.error("Upload failed:", error)
         }

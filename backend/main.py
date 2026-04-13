@@ -1,11 +1,11 @@
-from typing import Annotated
+import os
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-import os
+
+from hume_setup import stream_file
 
 app = FastAPI()
 
-# Ensure this matches your Vite dev server address exactly
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -26,7 +26,6 @@ async def root():
 @app.post("/analyze")
 async def create_upload_file(file: UploadFile = File(...)):
     # file: UploadFile automatically handles the multipart/form-data
-
     upload_directory = "upload"
     if not os.path.exists(upload_directory) :
         os.makedirs(upload_directory)
@@ -36,12 +35,21 @@ async def create_upload_file(file: UploadFile = File(...)):
     with open(file_path, "wb") as buffer:
         content = await file.read()
         buffer.write(content)
-
-    return {
-        "filename": file.filename,
-        "status": "received successfully",
-        "path": file_path
-    }
+    
+    try:
+        data = await stream_file(file_path)
+    
+        return {
+            "filename": file.filename,
+            "status": "received successfully",
+            "path": file_path,
+            "data": data,
+        }
+    except Exception as e:
+        return {
+                "status": "error",
+                "message": str(e),
+            }
 
 if __name__ == "__main__":
     import uvicorn
