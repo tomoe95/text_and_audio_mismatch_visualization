@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 async def stream_file(file_path):
     load_dotenv()
-    client = AsyncHumeClient(api_key=os.getenv("HUME_API_KEY")
+    client = AsyncHumeClient(api_key=os.getenv("VITE_HUME_API_KEY")
 )
 
     async with client.expression_measurement.stream.connect() as socket:
