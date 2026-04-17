@@ -16,12 +16,23 @@ async def stream_file(file_path):
         print(result)
 
         prosody_predictions = result.prosody.predictions
+
+        # collect all emotions across all predictions
+        emotion_totals: dict[str, float] = {}
+        emotion_counts: dict[str, int] = {}
+
         for prediction in prosody_predictions:
-           sorted_emotions = sorted(prediction.emotions, key=lambda e: e.score, reverse=True)
+           for emotion in prediction.emotions:
+               name = emotion.name
+               emotion_totals[name] = emotion_totals.get(name, 0.0) + emotion.score
+               emotion_counts[name] = emotion_counts.get(name, 0) + 1
 
-           for emotion in sorted_emotions:
-               print(f"{emotion.name}: {emotion.score:.3f}")
+        averaged = [
+               {"name": name, "score": round(emotion_totals[name] / emotion_counts[name], 6)}
+                for name in emotion_totals
+            ]
+        averaged.sort(key=lambda e: e["score"], reverse=True)               
 
-    return sorted_emotions
+    return averaged
 
 

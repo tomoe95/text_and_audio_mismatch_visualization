@@ -3,18 +3,30 @@ import math
 ## hume -> 4 bucket mapping
 
 HUME_EMOTION_MAP = {
-        "joy":  ["Joy", "Amusement", "Excitement", "Ecstasy", "Elation",
-                 "Euphoria", "Pride", "Relief", "Satisfaction", "Triumph"],
-    "optimism": ["Admiration", "Adoration", "Aesthetic Appreciation", "Calmness",
-                 "Contentment", "Desire", "Hope", "Interest", "Love",
-                 "Nostalgia", "Romance", "Surprise (positive)", "Sympathy"],
-    "anger":    ["Anger", "Contempt", "Disgust", "Embarrassment", "Envy",
-                 "Frustration", "Horror", "Rage", "Shame", "Surprise (negative)"],
-    "sadness":  ["Anxiety", "Awkwardness", "Boredom", "Confusion", "Despair",
-                 "Disappointment", "Distress", "Doubt", "Fear", "Guilt",
-                 "Pain", "Sadness", "Tiredness", "Worry"],
+    "joy": [
+        "Joy", "Amusement", "Excitement", "Ecstasy", "Elation",
+        "Euphoria", "Pride", "Relief", "Satisfaction", "Triumph"
+    ],
+    
+    "optimism": [
+        "Admiration", "Adoration", "Aesthetic Appreciation", "Calmness",
+        "Contentment", "Desire", "Hope", "Interest", "Love",
+        "Nostalgia", "Romance", "Surprise (positive)", "Sympathy",
+        "Awe", "Realization", "Entrancement", "Determination", 
+                 "Contemplation", "Craving", "Concentration"
+    ],
+                 
+    "anger": [
+        "Anger", "Contempt", "Disgust", "Embarrassment", "Envy",
+        "Frustration", "Horror", "Rage", "Shame", "Surprise (negative)"
+    ],
+                 
+    "sadness": [
+        "Anxiety", "Awkwardness", "Boredom", "Confusion", "Despair",
+        "Disappointment", "Distress", "Doubt", "Fear", "Guilt",
+        "Pain", "Sadness", "Tiredness", "Worry", "Empathic Pain"
+    ],
 }
-
 
 def collapse_hume_to_4_emotions(hume_predictions: list[dict]) -> dict:
     # normalize the percentages for 4 emptoions that sum to 100
@@ -25,7 +37,12 @@ def collapse_hume_to_4_emotions(hume_predictions: list[dict]) -> dict:
         name = predict["name"]
         score = predict["score"]
         placed = False
-        break
+    
+        for bucket, emotions in HUME_EMOTION_MAP.items():
+            if name in emotions:
+                buckets[bucket] += score
+                placed = True
+                break
 
         if not placed:
             unmapped.append(name)

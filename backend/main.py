@@ -1,10 +1,16 @@
 import os
+import asyncio
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import transformers
 
 from hume_setup import stream_file
-from emotion_engine import collapse_hume_to_4_emotions, collapse_nytk_to_4emotions, calculate_mismatch
-
+from emotion_engine import (
+        collapse_hume_to_4_emotions, 
+        collapse_nytk_to_4emotions, 
+        calculate_mismatch
+    )
+from text import get_text_sentiment
 
 app = FastAPI()
 
@@ -26,7 +32,8 @@ async def root():
     return {"message": "Server is running"}
 
 @app.post("/analyze")
-async def create_upload_file(file: UploadFile = File(...)):
+async def create_upload_file(file: UploadFile = File(...), transcript: str=""):
+    ## 1. save uplad audio
     # file: UploadFile automatically handles the multipart/form-data
     upload_directory = "upload"
     if not os.path.exists(upload_directory) :
@@ -38,20 +45,44 @@ async def create_upload_file(file: UploadFile = File(...)):
         content = await file.read()
         buffer.write(content)
     
+    ## 2. run hume and nytk in  parallel
     try:
-        data = await stream_file(file_path)
-    
-        return {
-            "filename": file.filename,
-            "status": "received successfully",
-            "path": file_path,
-            "data": data,
-        }
+        hume_raw, nytk_raw = await asyncio.gather(
+                stream_file(file_path),
+                asyncio.to_thread(get_text_sentiment, transcript) if transcript
+                else asyncio.sleep(0, result=None),
+            )
     except Exception as e:
         return {
                 "status": "error",
                 "message": str(e),
             }
+
+    ## 3. collapse to 4 emotions
+    audio_emotions = collapse_hume_to_4_emotions(hume_raw)
+
+    if not transcript or nytk_raw is None:
+        return {
+                "status": "partial",
+                "note": "No transcript provided (I will add feature later)",
+                "audio_emotions": audio_emotions,
+                "hume_raw": hume_raw[:10], # top 10 for debuging
+            }
+
+    text_emotions = collapse_nytk_to_4emotions(nytk_raw)
+
+    ## 4. calculate mismath
+    mismatch = calculate_mismatch(audio_emotions, text_emotions)
+
+    ## 5. return everything
+    return {
+            "status": "ok",
+            "transcript": transcript,
+            "audio_emotions": audio_emotions,
+            "text_emotions": text_emotions,
+            "hume_raw": hume_raw,
+            "mismatch": mismatch,
+    }
 
 
 
