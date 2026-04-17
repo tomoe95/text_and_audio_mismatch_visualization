@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRef, useState } from react
+import { useNavigate } from react-router-dom
 
 export default function Recorder() {
     
@@ -7,7 +7,7 @@ export default function Recorder() {
 
     const [isRecording, setIsRecording] = useState(false)
     const [seconds, setSeconds] = useState(0)
-    const [recordedURL, setRecordedURL] = useState('')
+    const [recordedURL, setRecordedURL] = useState()
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
 
     const mediaStream = useRef<MediaStream | null>(null)
@@ -25,7 +25,7 @@ export default function Recorder() {
             mediaStream.current = stream
 
             // Use WebM type
-            const options = { mimeType: 'audio/webm' }
+            const options = { mimeType: audio/webm }
             const recorder = new MediaRecorder(stream, options)
             mediaRecorder.current = recorder
 
@@ -42,7 +42,7 @@ export default function Recorder() {
 
             recorder.onstop = () => {
                 // Create the blob with the correct mimeType
-                const blob = new Blob(chunks.current, { type: 'audio/webm' })
+                const blob = new Blob(chunks.current, { type: audio/webm })
                 const url = URL.createObjectURL(blob)
                 setRecordedURL(url)
                 setAudioBlob(blob)
@@ -59,7 +59,7 @@ export default function Recorder() {
         setIsRecording(false)
         if (timerRef.current) clearInterval(timerRef.current)
 
-        if (mediaRecorder.current && mediaRecorder.current.state !== 'inactive') {
+        if (mediaRecorder.current && mediaRecorder.current.state !== inactive) {
             mediaRecorder.current.stop()
         }
         if (mediaStream.current) {
@@ -77,11 +77,11 @@ export default function Recorder() {
         if (!audioBlob) return alert("No audio to send!")
 
         const formData = new FormData()
-        // 'file' matches the parameter name in your FastAPI endpoint
-        formData.append('file', audioBlob, 'recording.webm')
+        // file matches the parameter name in your FastAPI endpoint
+        formData.append(file, audioBlob, recording.webm)
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/analyze', {
+            const response = await fetch(http://127.0.0.1:8000/analyze, {
                 method: "POST",
                 body: formData,
             })
@@ -96,18 +96,18 @@ export default function Recorder() {
             console.log("Server response:", result)
             alert("Upload sucessful!")
             // Jump to /analyze path
-            navigate('/analyze', { state: {emotionsData: result.data } })
+            navigate(/analyze, { state: {emotionsData: result } })
         } catch (error) {
             console.error("Upload failed:", error)
         }
     }
 
     return (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ padding: 20px, textAlign: center }}>
             <h2>{formatTimer(seconds)}</h2>
 
             {isRecording ? (
-                <button onClick={stopRecording} style={{ color: 'red' }}>
+                <button onClick={stopRecording} style={{ color: red }}>
                     Stop Recording
                 </button>
             ) : (
@@ -116,15 +116,16 @@ export default function Recorder() {
                 </button>
             )}
 
-            <div style={{ marginTop: '20px' }}>
+            <div style={{ marginTop: 20px }}>
                 {recordedURL && <audio controls src={recordedURL} />}
             </div>
 
             {recordedURL && !isRecording && (
-                <button onClick={sendAudio} style={{ marginTop: '10px' }}>
+                <button onClick={sendAudio} style={{ marginTop: 10px }}>
                     Submit
                 </button>
             )}
         </div>
     )
 }
+
