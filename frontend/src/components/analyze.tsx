@@ -1,4 +1,4 @@
-import { useLocation, Link } from react-router-dom
+import { useLocation, Link } from 'react-router-dom'
 
 interface FourEmotions {
     joy: number
@@ -23,17 +23,17 @@ interface AnalyzeResult {
 }
 
 const EMOTION_COLORS: Record<string, string> = {
-    joy: #F59E0B,       // amber
-    optimism: #10B981,  // teal
-    anger: #EF4444,     // red
-    sadness: #3B82F6,   // blue
+    joy: '#F59E0B',       // amber
+    optimism: '#10B981',  // teal
+    anger: '#EF4444',     // red
+    sadness: '#3B82F6',   // blue
 }
 
 const EMOTION_LABELS: Record<string, string> = {
-    joy: 😄 Joy,
-    optimism: 🌿 Optimism,
-    anger: 🔥 Anger,
-    sadness: 💧 Sadness,
+    joy: '😄 Joy',
+    optimism: '🌿 Optimism',
+    anger: '🔥 Anger',
+    sadness: '💧 Sadness',
 }
 
 
@@ -81,7 +81,7 @@ export default function Analyze() {
         )
     }
 
-    const isPartial = result.status == partial
+    const isPartial = result.status == "partial"
 
     return (
         <div>
@@ -123,7 +123,7 @@ export default function Analyze() {
                     {(Object.entries(result.mismatch.per_emotion_diff) as [string, number][]).map(([key, diff]) => (
                         <div key={key}>
                             <span>{EMOTION_LABELS[key]}</span>
-                            <span>{diff > 0 ? + : }{diff.toFixed(1)}%</span>
+                            <span>{diff > 0 ? '+' :''}{diff.toFixed(1)}%</span>
                         </div>
                     ))}
                 </div>
