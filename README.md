@@ -15,6 +15,9 @@ A web application that analyzes the emotional mismatch between spoken audio and 
 
 ### Planned Features
 - Enhanced mismatch visualization (charts, graphs)
+=======
+- Automatic speech-to-text transcription (currently requires manual transcript input)
+- Enhanced mismatch visualization
 - Support for additional languages beyond Hungarian
 
 ## Architecture
@@ -34,6 +37,7 @@ Both audio and text emotions are normalized to 4 categories:
 
 | Audio (Hume) | Text (NYTK) |
 |--------------|-------------|
+<<<<<<< HEAD
 | Joy, Amusement, Excitement, etc. | LABEL_2 (positive) → joy + optimism |
 | Admiration, Hope, Love, etc. | LABEL_1 (neutral) → mostly sadness |
 | Anger, Contempt, Disgust, etc. | LABEL_0 (negative) → anger + sadness |
@@ -46,6 +50,12 @@ The optimism bucket can be weighted in `backend/emotion_engine.py`:
 ```python
 OPTIMISM_WEIGHT = 0.5  # 0.0-1.0, lower = less optimism influence
 ```
+
+=======
+| Joy, Amusement, Excitement, etc. | POSITIVE → joy + optimism |
+| Admiration, Hope, Love, etc. | NEUTRAL → mostly sadness |
+| Anger, Contempt, Disgust, etc. | NEGATIVE → anger + sadness |
+| Anxiety, Fear, Sadness, etc. | |
 
 ## Project Structure
 
@@ -67,6 +77,10 @@ OPTIMISM_WEIGHT = 0.5  # 0.0-1.0, lower = less optimism influence
 │   ├── text.py                 # Text sentiment analysis (NYTK worker launcher)
 │   ├── text_worker.py          # NYTK worker process (sentiment analysis)
 │   └── requirements.txt        # Python dependencies
+=======
+│   ├── transcript.py           # Text sentiment analysis
+│   ├── text.py                 # Whisper transcription
+│   └── text_worker.py          # NYTK worker process
 └── README.md
 ```
 
@@ -86,6 +100,7 @@ OPTIMISM_WEIGHT = 0.5  # 0.0-1.0, lower = less optimism influence
 
 See `backend/requirements.txt` for full list.
 
+=======
 ### Backend
 
 ```bash
@@ -148,6 +163,7 @@ This happens when the sentiment model returns unexpected labels. Check that `emo
 ### Optimism always dominates audio output
 Adjust `OPTIMISM_WEIGHT` in `backend/emotion_engine.py` to reduce optimism influence (default: 0.5).
 
+=======
 ## License
 
 MIT
