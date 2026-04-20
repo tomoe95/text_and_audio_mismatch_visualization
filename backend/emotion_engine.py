@@ -2,6 +2,9 @@ import math
 
 ## hume -> 4 bucket mapping
 
+# Optimism weight: 1.0 = normal, 0.5 = half strength, 0.3 = 70% reduction, etc.
+OPTIMISM_WEIGHT = 0.5
+
 HUME_EMOTION_MAP = {
     "joy": [
         "Joy", "Amusement", "Excitement", "Ecstasy", "Elation",
@@ -50,11 +53,14 @@ def collapse_hume_to_4_emotions(hume_predictions: list[dict]) -> dict:
     if unmapped:
         print(f"Unmapped Hume emotions: {unmapped}")
 
+    # apply optimism weight
+    buckets["optimism"] *= OPTIMISM_WEIGHT
+
     # normalize to percentage
     total = sum(buckets.values())
     if total == 0:
         return {"joy": 25.0, "optimism": 25.0, "anger": 25.0, "sadness": 25.0}
-    
+
     result = {
         k: round((v / total) * 100, 4) for k, v in buckets.items()
     }
@@ -62,11 +68,12 @@ def collapse_hume_to_4_emotions(hume_predictions: list[dict]) -> dict:
     return result
 
 ## NYTK sentiment -> 4 emotion mapping
+# LABEL_0=negative, LABEL_1=neutral, LABEL_2=positive (NYTK Hungarian model)
 NYTK_LABEL_MAP = {
     # label        joy    optimism  anger   sadness
-    "POSITIVE":  (0.55,   0.45,    0.00,   0.00),
-    "NEUTRAL":   (0.10,   0.30,    0.10,   0.50),
-    "NEGATIVE":  (0.00,   0.00,    0.50,   0.50),
+    "LABEL_2":    (0.55,   0.45,    0.00,   0.00),  # positive
+    "LABEL_1":    (0.10,   0.30,    0.10,   0.50),  # neutral
+    "LABEL_0":    (0.00,   0.00,    0.50,   0.50),  # negative
 }
 
 def collapse_nytk_to_4emotions(nytk_scores: dict) -> dict:
