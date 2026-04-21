@@ -6,19 +6,20 @@ A web application that analyzes the emotional mismatch between spoken audio and 
 
 **Work in Progress** - This project is under active development.
 
+## Features
+
 ### Current Features
 - Record audio through the browser
 - Analyze audio emotions using Hume AI
 - Analyze text emotions using NYTK (Hungarian sentiment analysis)
 - Normalize both outputs to a shared 4-emotion schema (joy, optimism, anger, sadness)
 - Calculate and visualize emotion mismatch between audio and text
+- **Radar chart visualization** for comparing audio vs text emotions
 
 ### Planned Features
-- Enhanced mismatch visualization (charts, graphs)
-=======
 - Automatic speech-to-text transcription (currently requires manual transcript input)
-- Enhanced mismatch visualization
 - Support for additional languages beyond Hungarian
+- Enhanced mismatch visualization (trend graphs, historical comparison)
 
 ## Architecture
 
@@ -37,7 +38,6 @@ Both audio and text emotions are normalized to 4 categories:
 
 | Audio (Hume) | Text (NYTK) |
 |--------------|-------------|
-<<<<<<< HEAD
 | Joy, Amusement, Excitement, etc. | LABEL_2 (positive) → joy + optimism |
 | Admiration, Hope, Love, etc. | LABEL_1 (neutral) → mostly sadness |
 | Anger, Contempt, Disgust, etc. | LABEL_0 (negative) → anger + sadness |
@@ -51,12 +51,6 @@ The optimism bucket can be weighted in `backend/emotion_engine.py`:
 OPTIMISM_WEIGHT = 0.5  # 0.0-1.0, lower = less optimism influence
 ```
 
-=======
-| Joy, Amusement, Excitement, etc. | POSITIVE → joy + optimism |
-| Admiration, Hope, Love, etc. | NEUTRAL → mostly sadness |
-| Anger, Contempt, Disgust, etc. | NEGATIVE → anger + sadness |
-| Anxiety, Fear, Sadness, etc. | |
-
 ## Project Structure
 
 ```
@@ -64,23 +58,20 @@ OPTIMISM_WEIGHT = 0.5  # 0.0-1.0, lower = less optimism influence
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── recorder.tsx    # Audio recording UI
-│   │   │   └── analyze.tsx     # Results visualization
+│   │   │   ├── recorder.tsx      # Audio recording UI
+│   │   │   ├── analyze.tsx       # Results visualization
+│   │   │   └── radarChart.tsx    # D3-based radar chart component
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   └── package.json
 ├── backend/
-│   ├── main.py                 # FastAPI server
-│   ├── emotion_engine.py       # Emotion normalization & mismatch calculation
-│   ├── hume_setup.py           # Hume AI integration
-│   ├── transcript.py           # Whisper transcription (Hungarian)
-│   ├── text.py                 # Text sentiment analysis (NYTK worker launcher)
-│   ├── text_worker.py          # NYTK worker process (sentiment analysis)
-│   └── requirements.txt        # Python dependencies
-=======
-│   ├── transcript.py           # Text sentiment analysis
-│   ├── text.py                 # Whisper transcription
-│   └── text_worker.py          # NYTK worker process
+│   ├── main.py                   # FastAPI server
+│   ├── emotion_engine.py         # Emotion normalization & mismatch calculation
+│   ├── hume_setup.py             # Hume AI integration
+│   ├── text.py                   # Text sentiment analysis (NYTK worker launcher)
+│   ├── text_worker.py            # NYTK worker process (sentiment analysis)
+│   ├── transcript.py             # Whisper transcription (Hungarian)
+│   └── requirements.txt          # Python dependencies
 └── README.md
 ```
 
@@ -91,16 +82,6 @@ OPTIMISM_WEIGHT = 0.5  # 0.0-1.0, lower = less optimism influence
 - Python 3.10+
 - Hume AI API key (configure in `backend/hume_setup.py`)
 
-### Backend Dependencies
-
-- `fastapi`, `uvicorn` - Web server
-- `transformers`, `torch` - NYTK sentiment analysis
-- `hume-api` - Hume AI audio emotion detection
-- `openai-whisper` - Speech-to-text transcription
-
-See `backend/requirements.txt` for full list.
-
-=======
 ### Backend
 
 ```bash
@@ -148,7 +129,7 @@ Upload an audio file for emotion analysis.
 
 ## Technologies
 
-- **Frontend**: React, TypeScript, Vite, React Router
+- **Frontend**: React, TypeScript, Vite, React Router, D3.js
 - **Backend**: FastAPI, uvicorn
 - **AI/ML**:
   - Hume AI (audio emotion detection)
@@ -163,7 +144,6 @@ This happens when the sentiment model returns unexpected labels. Check that `emo
 ### Optimism always dominates audio output
 Adjust `OPTIMISM_WEIGHT` in `backend/emotion_engine.py` to reduce optimism influence (default: 0.5).
 
-=======
 ## License
 
 MIT
