@@ -1,5 +1,7 @@
 import { useLocation, Link } from 'react-router-dom'
 
+import RadarChart from './radarChart'
+
 interface FourEmotions {
     joy: number
     optimism: number
@@ -114,6 +116,15 @@ export default function Analyze() {
                 {result.text_emotions && (
                     <EmotionCard title="📝 Text Emotions" emotions={result.text_emotions} />
                 )}
+            </div>
+
+            {/* radar chart visualization */}
+            <div style={{ marginTop: '2rem' }}>
+                <h3>Emotion Comparison</h3>
+                <RadarChart
+                    audio={result.audio_emotions}
+                    text={result.text_emotions || result.audio_emotions}
+                />
             </div>
 
             {/* per-emotion diff */}
