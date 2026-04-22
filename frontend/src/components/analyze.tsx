@@ -1,6 +1,8 @@
 import { useLocation, Link } from 'react-router-dom'
 
 import RadarChart from './radarChart'
+import './analyze.css'
+
 
 interface FourEmotions {
     joy: number
@@ -39,33 +41,40 @@ const EMOTION_LABELS: Record<string, string> = {
 }
 
 
-function EmotionBar({ label, value }: {label: string; value: number; color: string}) {
+function MatchScore({ percent }: { percent: number }) {
+    const color = percent >= 70 ? '#10B981' : percent >= 40 ? '#F59E0B' : '#EF4444'
+    const label = percent >= 70 ? 'High Match' : percent >= 40 ? 'Partial Match' : 'Low Match'
+
     return (
-        <div>
-            <span>{label}</span>
-            <span>{value.toFixed(1)}%</span>
+        <div className='match-score-wrapper'>
+            <div className='match-score-number' style={{ color }}>
+                {percent}%
+            </div>
+            <div className='match-score-label' style={{ color }}>
+                {label}
+            </div>
+            <div className='match-score-sub'>
+                Emotion Match
+            </div>
         </div>
     )
 }
 
-function EmotionCard({ title, emotions }: { title: string; emotions: FourEmotions }) {
-    if (!emotions) return null;
-
+function DiffTable({ diff }: { diff: FourEmotions }) {
     return (
-        <div>
-            <h3>{title}</h3>
-            {(Object.keys(emotions) as Array<keyof FourEmotions>).map((key) => (
-                <EmotionBar
-                    key={key}
-                    label={EMOTION_LABELS[key]}
-                    value={emotions[key]}
-                    color={EMOTION_COLORS[key]}
-                />
+        <div className='diff-table'>
+            <h3 className='diff-title'>Emotion Difference (Audio - Text)</h3>
+            {(Object.entries(diff) as [string, number][]).map(([key, val]) => (
+                <div key={key} className='diff-row'>
+                    <span className='diff-label'>{EMOTION_LABELS[key]}</span>
+                    <span className='diff-value' style={{ color: val > 0 ? '#6366f1' : val < 0 ? '#f59e0b' : '#9ca3af' }} >
+                        { val > 0 ? '+' : ''}{val.toFixed(1)}%
+                    </span>
+                </div>
             ))}
         </div>
     )
 }
-
 
 export default function Analyze() {
     // get the emotionData from recorder.tsx
@@ -76,7 +85,7 @@ export default function Analyze() {
     
     if(!result) {
         return (
-            <div>
+            <div className='no-data'>
                 <p>No analysis data found.</p>
                 <Link to="/">Go back to Recorder</Link>
             </div>
@@ -86,41 +95,24 @@ export default function Analyze() {
     const isPartial = result.status == "partial"
 
     return (
-        <div>
-            <h2>Analysis Result</h2>
+        <div className='analyze-page'>
+            <h2 className='analyze-title'>Analysis Result</h2>
             
             {result.transcript && (
-                <div>
-                    <strong>Transcript:</strong> {result.transcript}
+                <div className='transcript-box'>
+                    <strong>🎤 Transcript:</strong> {result.transcript}
                 </div>
             )}
 
             {isPartial && result.note && (
-                <div>
+                <div className='warning-box'>
                     ⚠️ {result.note}
                 </div>
             )}
 
-            {result.mismatch && (
-                <div>
-                    {result.mismatch.match_percent}%
-                    <div>
-                        Emotion Match
-                    </div>
-                </div>
-            )}
+            {result.mismatch && <MatchScore percent={result.mismatch.match_percent} />}
 
-            {/* side-by-side emotion cards */}
-            <div>
-                <EmotionCard title="🎙️ Audio Emotions" emotions={result.audio_emotions} />
-                {result.text_emotions && (
-                    <EmotionCard title="📝 Text Emotions" emotions={result.text_emotions} />
-                )}
-            </div>
-
-            {/* radar chart visualization */}
-            <div style={{ marginTop: '2rem' }}>
-                <h3>Emotion Comparison</h3>
+            <div className='chart-section'>
                 <RadarChart
                     audio={result.audio_emotions}
                     text={result.text_emotions || result.audio_emotions}
@@ -128,19 +120,9 @@ export default function Analyze() {
             </div>
 
             {/* per-emotion diff */}
-            {result.mismatch && (
-                <div>
-                    <h3>Emotion Difference (Audio - Text)</h3>
-                    {(Object.entries(result.mismatch.per_emotion_diff) as [string, number][]).map(([key, diff]) => (
-                        <div key={key}>
-                            <span>{EMOTION_LABELS[key]}</span>
-                            <span>{diff > 0 ? '+' :''}{diff.toFixed(1)}%</span>
-                        </div>
-                    ))}
-                </div>
-            )}
+            {result.mismatch && <DiffTable diff={result.mismatch.per_emotion_diff} />}
 
-            <Link to="/">Record again</Link>
+            <Link className='back-link' to="/">Record again</Link>
         </div>
     )
 }
