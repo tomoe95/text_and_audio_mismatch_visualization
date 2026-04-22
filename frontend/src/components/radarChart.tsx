@@ -40,8 +40,8 @@ function toRad(deg: number) {
     return deg * (Math.PI / 180)
 }
 
-function emotionToPoint(emotion: FourEmotions, key: string, angle: number) {
-    const value = (emotion as any)[key] / 100 // [0,1]
+function emotionToPoint(emotion: FourEmotions, key: string, angle: number, maxVal: number) {
+    const value = (emotion as any)[key] / maxVal // [0,1] relative to max value
     const r = value * RADIUS
     
     return {
@@ -65,7 +65,13 @@ export default function RadarChart({ audio = AUDIO, text = TEXT }: RadarChartPro
 
         const g = svg.append('g').attr('transform', `translate(${CX},${CY})`) // group element <g> -> centering the SVG part
 
-        
+        // dynamic scaling
+        const allValues = AXES.flatMap(ax => [
+            (audio as any)[ax.key],
+            (text as any)[ax.key],
+        ])
+        const maxVal = Math.max(...allValues)
+
         const levels = [25, 50, 75, 100]
         levels.forEach(level => {
             const r = (level / 100) * RADIUS
@@ -85,7 +91,7 @@ export default function RadarChart({ audio = AUDIO, text = TEXT }: RadarChartPro
                 .attr('y', -r + 3)
                 .attr('font-size', '10px')
                 .attr('font-family', 'monospace')
-                .text(`${level}%`)
+                .text(`${Math.round(maxVal * level / 100)}%`)
         })
 
 
@@ -102,7 +108,7 @@ export default function RadarChart({ audio = AUDIO, text = TEXT }: RadarChartPro
         })
 
 
-        const audioPoints = AXES.map(ax => emotionToPoint(audio, ax.key, ax.angle))
+        const audioPoints = AXES.map(ax => emotionToPoint(audio, ax.key, ax.angle, maxVal))
         g.append('path')
             .attr('d', pointsToPath(audioPoints))
             .attr('fill', COLOR_AUDIO)
@@ -118,7 +124,7 @@ export default function RadarChart({ audio = AUDIO, text = TEXT }: RadarChartPro
         })
 
 
-        const textPoints = AXES.map(ax => emotionToPoint(text, ax.key, ax.angle))
+        const textPoints = AXES.map(ax => emotionToPoint(text, ax.key, ax.angle, maxVal))
             g.append('path')
                 .attr('d', pointsToPath(textPoints))
                 .attr('fill', COLOR_TEXT)
