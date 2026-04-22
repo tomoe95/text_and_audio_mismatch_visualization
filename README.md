@@ -2,10 +2,6 @@
 
 A web application that analyzes the emotional mismatch between spoken audio and transcribed text. Built with React (frontend) and FastAPI (backend).
 
-## Project Status
-
-**Work in Progress** - This project is under active development.
-
 ## Features
 
 ### Current Features
@@ -14,12 +10,13 @@ A web application that analyzes the emotional mismatch between spoken audio and 
 - Analyze text emotions using NYTK (Hungarian sentiment analysis)
 - Normalize both outputs to a shared 4-emotion schema (joy, optimism, anger, sadness)
 - Calculate and visualize emotion mismatch between audio and text
-- **Radar chart visualization** for comparing audio vs text emotions
+- **Radar chart visualization** with dynamic scaling for comparing audio vs text emotions
+- **Match score display** with color-coded thresholds (High/Partial/Low match)
+- **Per-emotion difference table** showing signed differences with color indicators
 
 ### Planned Features
-- Automatic speech-to-text transcription (currently requires manual transcript input)
 - Support for additional languages beyond Hungarian
-- Enhanced mismatch visualization (trend graphs, historical comparison)
+- Historical comparison and trend analysis
 
 ## Architecture
 
@@ -59,8 +56,10 @@ OPTIMISM_WEIGHT = 0.5  # 0.0-1.0, lower = less optimism influence
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── recorder.tsx      # Audio recording UI
-│   │   │   ├── analyze.tsx       # Results visualization
-│   │   │   └── radarChart.tsx    # D3-based radar chart component
+│   │   │   ├── analyze.tsx       # Results visualization with match score & diff table
+│   │   │   ├── analyze.css       # Styles for analyze page
+│   │   │   ├── radarChart.tsx    # D3-based radar chart component
+│   │   │   └── radarChart.css    # Styles for radar chart
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   └── package.json
