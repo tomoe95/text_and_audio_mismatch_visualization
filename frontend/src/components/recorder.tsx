@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import './recorder.css'
 
 export default function Recorder() {
     
@@ -103,27 +104,43 @@ export default function Recorder() {
     }
 
     return (
-        <div style={{ padding: '20px', textAlign:'center' }}>
-            <h2>{formatTimer(seconds)}</h2>
-
-            {isRecording ? (
-                <button onClick={stopRecording} style={{ color: 'red' }}>
-                    Stop Recording
-                </button>
-            ) : (
-                <button onClick={startRecording}>
-                    Start Recording
-                </button>
-            )}
-
-            <div style={{ marginTop: '20px' }}>
-                {recordedURL && <audio controls src={recordedURL} />}
+        <div className='recorder-page'>
+            <h2 className='recorder-title'>Emotion Recorder</h2>
+            <p className='recorder-subtitle'>Speak in Hungarian -we'll analyze your emotion</p>
+            
+            <div className={`recorder-timer ${isRecording ? 'recording' : ''}`}>
+                {formatTimer(seconds)}
             </div>
 
+            <div className='recorder-controls'>
+                {isRecording ? (
+                    <>
+                        <button className='btn-record recording' onClick={stopRecording}>
+                            ⏹️
+                        </button>
+                        <span className='btn-label'>Stop</span>
+                    </>
+                ) : (
+                    <>
+                        <button className='btn-record' onClick={startRecording}>
+                            🎙️
+                        </button>
+                        <span className='btn-label'>Record</span>
+                    </>
+                )}
+            </div>
+            
             {recordedURL && !isRecording && (
-                <button onClick={sendAudio} style={{ marginTop: '10px' }}>
-                    Submit
-                </button>
+                <div className='recorder-playback'>
+                    <audio controls src={recordedURL} />
+                    <button className='btn-submit' onClick={sendAudio}>
+                        analyze
+                    </button>
+                </div>
+            )}
+
+            {!recordedURL && !isRecording && (
+                <p className='recorder-hint'>Press the button above to start recording</p>    
             )}
         </div>
     )

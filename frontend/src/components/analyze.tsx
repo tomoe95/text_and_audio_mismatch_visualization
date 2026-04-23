@@ -122,7 +122,7 @@ export default function Analyze() {
             {/* per-emotion diff */}
             {result.mismatch && <DiffTable diff={result.mismatch.per_emotion_diff} />}
 
-            <Link className='back-link' to="/">Record again</Link>
+            <Link className='back-link' to="/">⬅️ Record again</Link>
         </div>
     )
 }

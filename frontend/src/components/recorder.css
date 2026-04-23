@@ -1,0 +1,146 @@
+.recorder-page {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    box-sizing: border-box;
+}
+
+/* Title */
+.recorder-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.recorder-subtitle {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    font-family: monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: -1.25rem 0 0 0;
+}
+
+/* Timer */
+.recorder-timer {
+    font-size: 3.5rem;
+    font-weight: 700;
+    font-family: monospace;
+    color: #111827;
+    line-height: 1;
+    letter-spacing: 0.05em;
+}
+
+.recorder-timer.recording {
+    color: #EF4444;
+}
+
+/* Buttons */
+.recorder-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn-record {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: none;
+    background: #111827;
+    color: white;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-record:hover {
+    background: #374151;
+    transform: scale(1.05);
+}
+
+button.btn-record.recording {
+    margin: 0;
+}
+
+.btn-record.recording {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #EF4444;
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+.btn-record.recording:hover {
+    background: #dc2626;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    50%       { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+}
+
+.btn-label {
+    font-size: 0.8rem;
+    font-family: monospace;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Audio playback */
+.recorder-playback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.recorder-playback audio {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+}
+
+.btn-submit {
+    padding: 0.6rem 2rem;
+    background: #111827;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: monospace;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.2s;
+}
+
+.btn-submit:hover {
+    background: #374151;
+}
+
+.btn-submit:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Status hint */
+.recorder-hint {
+    font-size: 0.82rem;
+    color: #d1d5db;
+    font-family: monospace;
+    text-align: center;
+}
