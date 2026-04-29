@@ -11,12 +11,20 @@ export default function Recorder() {
     const [recordedURL, setRecordedURL] = useState()
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
 
+    const [isLoading, setIsLoading] = useState(false)
+    const [micError, setMicError] = useState<string>('')
+    const [uploadError, setUploadError] = useState<string>('')
+
+
     const mediaStream = useRef<MediaStream | null>(null)
     const mediaRecorder = useRef<MediaRecorder | null>(null)
     const chunks = useRef<Blob[]>([])
     const timerRef = useRef<number | null>(null)
 
     const startRecording = async () => {
+        setMicError('')
+        setUploadError('')
+    
         setIsRecording(true)
         setSeconds(0)
         chunks.current = []
@@ -50,9 +58,17 @@ export default function Recorder() {
             }
 
             recorder.start()
-        } catch (error) {
-            console.error("Error accessing microphone:", error)
+
+        } catch (error: any) {
             setIsRecording(false)
+
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                setMicError('Microphone access denied. Please allow microphone permission in your browser settings and try again.')
+            } else if (error.name === 'NotFoundError') {
+                setMicError('No microphone found. Please connect a microphone and try again.')
+            } else {
+                setMicError(`Microphone error: ${error.message}`)
+            }
         }
     }
 
@@ -77,6 +93,9 @@ export default function Recorder() {
     const sendAudio = async () => {
         if (!audioBlob) return alert("No audio to send!")
 
+        setUploadError('')
+        setIsLoading(true)
+
         const formData = new FormData()
         // file matches the parameter name in your FastAPI endpoint
         formData.append("file", audioBlob, "recording.webm")
@@ -94,12 +113,27 @@ export default function Recorder() {
             }
 
             const result = await response.json()
-            console.log("Server response:", result)
-            alert("Upload sucessful!")
+
+            if (result.status === 'error') {
+                throw new Error(result.message || 'Analysis failed on the server.')
+            }
+
+            if (result.status === 'ok' && (!result.transcript || result.transcript.trim() === '')) {
+                setUploadError('⚠️ No speech detected. The audio may be too quiet or not in Hungarian. Please try again.')
+                setIsLoading(false)
+                return
+            }
+
             // Jump to /analyze path
             navigate('/analyze', { state: {emotionsData: result } })
-        } catch (error) {
-            console.error("Upload failed:", error)
+        } catch (error: any) {
+            if (error.message.includes('Failed to fetch')) {
+                setUploadError('Cannot reach the server. Make sure the backend is running on port 8000.')
+            } else {
+                setUploadError(`Error: ${error.message}`)
+            }
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -112,18 +146,24 @@ export default function Recorder() {
                 {formatTimer(seconds)}
             </div>
 
+            {micError && (
+                <div className='error-box'>
+                    🎙️ {micError}
+                </div>
+            )}
+
             <div className='recorder-controls'>
                 {isRecording ? (
                     <>
                         <button className='btn-record recording' onClick={stopRecording}>
-                            ⏹️
+                            <span className='btn-icon-stop' />
                         </button>
                         <span className='btn-label'>Stop</span>
                     </>
                 ) : (
                     <>
                         <button className='btn-record' onClick={startRecording}>
-                            🎙️
+                            <span className='btn-icon-mic' />
                         </button>
                         <span className='btn-label'>Record</span>
                     </>
@@ -133,13 +173,25 @@ export default function Recorder() {
             {recordedURL && !isRecording && (
                 <div className='recorder-playback'>
                     <audio controls src={recordedURL} />
-                    <button className='btn-submit' onClick={sendAudio}>
-                        analyze
-                    </button>
+                    
+                    {uploadError && (
+                        <div className='error-box'>{uploadError}</div>
+                    )}
+
+                    {isLoading ? (
+                        <div className='loading-wrapper'>
+                            <div className='spinner' />
+                            <span className='loading-label'>Analyzing...</span>
+                        </div>
+                    ) : (
+                        <button className='btn-submit' onClick={sendAudio} disabled={isLoading}>
+                            Analyze →
+                        </button>
+                    )}
                 </div>
             )}
 
-            {!recordedURL && !isRecording && (
+            {!recordedURL && !isRecording && !micError && (
                 <p className='recorder-hint'>Press the button above to start recording</p>    
             )}
         </div>
