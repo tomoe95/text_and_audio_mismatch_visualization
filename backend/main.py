@@ -43,6 +43,12 @@ async def analyze(file: UploadFile = File(...), transcript: str=""):
         ## 2. transcribe audio -> hungarian text
         transcript = await asyncio.to_thread(transcribe, file_path)
 
+        if not transcript or transcript.strip() == '':
+            return {
+                'status': 'error',
+                'message': 'No speech detected. The audio may be too quiet or not in Hungarian.',
+            }
+
         ## 3. run hume and nytk in  parallel
         hume_raw, nytk_raw = await asyncio.gather(
                 stream_file(file_path),
